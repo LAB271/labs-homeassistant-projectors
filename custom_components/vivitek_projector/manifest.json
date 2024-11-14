@@ -1,0 +1,8 @@
+{
+    "domain": "vivitek_projector",
+    "name": "Vivitek Projector",
+    "documentation": "https://github.com/LAB271/ha-vivitek/",
+    "dependencies": [],
+    "codeowners": [],
+    "version": "1.0"
+  }
