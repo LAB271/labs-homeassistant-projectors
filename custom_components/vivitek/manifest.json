@@ -1,8 +1,9 @@
 {
-    "domain": "vivitek_projector",
+    "domain": "vivitek",
     "name": "Vivitek Projector",
     "documentation": "https://github.com/LAB271/ha-vivitek/",
+    "iot_class": "local_polling",
     "dependencies": [],
     "codeowners": [],
-    "version": "1.0"
+    "version": "0.1.0"
   }
