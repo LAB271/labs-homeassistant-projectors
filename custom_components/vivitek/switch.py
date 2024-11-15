@@ -1,26 +1,20 @@
 import logging
 import socket
-import voluptuous as vol
-
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.const import CONF_IP_ADDRESS, CONF_FRIENDLY_NAME, CONF_PLATFORM
-import homeassistant.helpers.config_validation as cv
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+
+from . import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_PORT = 7000
 
-PLATFORM_SCHEMA = vol.Schema({
-    vol.Required(CONF_PLATFORM): cv.string,
-    vol.Required(CONF_IP_ADDRESS): cv.string,
-    vol.Optional(CONF_FRIENDLY_NAME, default="Vivitek Projector"): cv.string,
-})
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
+    ip_address = entry.data["ip_address"]
+    friendly_name = entry.data["friendly_name"]
 
-
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    ip_address = config[CONF_IP_ADDRESS]
-    friendly_name = config[CONF_FRIENDLY_NAME]
-    add_entities([VivitekProjectorSwitch(ip_address, friendly_name)], True)
+    async_add_entities([VivitekProjectorSwitch(ip_address, friendly_name)], True)
 
 
 class VivitekProjectorSwitch(SwitchEntity):
