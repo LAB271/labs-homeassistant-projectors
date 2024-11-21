@@ -1,15 +1,22 @@
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
+from homeassistant.config_entries import ConfigEntry
+from .const import DOMAIN
 
-DOMAIN = "vivitek"
-
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the Vivitek component."""
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Set up the Vivitek integration from YAML."""
+    hass.data.setdefault(DOMAIN, {})
     return True
 
-async def async_setup_entry(hass: HomeAssistant, entry) -> bool:
-    """Set up Vivitek from a config entry."""
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "switch")
-    )
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up the Vivitek integration from a config entry."""
+    hass.data[DOMAIN][entry.entry_id] = entry.data
+
+    # Forward entry setup to the switch platform
+    await hass.config_entries.async_forward_entry_setup(entry, "switch")
+    return True
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    await hass.config_entries.async_forward_entry_unload(entry, "switch")
+    hass.data[DOMAIN].pop(entry.entry_id)
     return True

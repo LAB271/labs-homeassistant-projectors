@@ -4,10 +4,9 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
-from . import DOMAIN
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-
 DEFAULT_PORT = 7000
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
@@ -31,17 +30,17 @@ class VivitekProjectorSwitch(SwitchEntity):
 
     @property
     def name(self):
-        """Return the name of the projector."""
+        """Return the name of the switch."""
         return self._name
 
     @property
     def is_on(self):
-        """Return true if projector is on."""
+        """Return the switch state."""
         return self._is_on
 
     @property
     def device_info(self):
-        """Return device information about this projector."""
+        """Return device information for this projector."""
         return DeviceInfo(
             identifiers={(DOMAIN, self._device_id)},
             name=self._name,
@@ -50,37 +49,39 @@ class VivitekProjectorSwitch(SwitchEntity):
             sw_version="1.0",
         )
 
-    def turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs):
         """Turn the projector on."""
-        response = self._send_command('op power.on')
+        response = await self.hass.async_add_executor_job(self._send_command, 'op power.on')
         if response:
             self._is_on = True
+            self.async_write_ha_state()
 
-    def turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs):
         """Turn the projector off."""
-        response = self._send_command('op power.off')
+        response = await self.hass.async_add_executor_job(self._send_command, 'op power.off')
         if response:
             self._is_on = False
+            self.async_write_ha_state()
+
+    async def async_update(self):
+        """Fetch the projector's status."""
+        response = await self.hass.async_add_executor_job(self._send_command, 'op status ?')
+        if response and response.strip()[-1] == '2':  # Adjust based on actual response format
+            self._is_on = True
+        else:
+            self._is_on = False
+        self.async_write_ha_state()
 
     def _send_command(self, command):
-        """Send command to the projector."""
+        """Send a command to the projector."""
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(5)  # Timeout for socket
                 s.connect((self._ip_address, DEFAULT_PORT))
                 s.sendall((command + '\r').encode())
                 _LOGGER.info("Sent command '%s' to projector '%s'", command, self._name)
                 response = s.recv(1024)
                 return response.decode().strip()
         except Exception as e:
-            _LOGGER.error("Failed to send command '%s' to projector '%s': %s", command, self._name, str(e))
+            _LOGGER.error("Error communicating with projector '%s': %s", self._name, e)
         return None
-
-    def update(self):
-        """Update state of the projector."""
-        response = self._send_command('op status ?')
-        if not response:
-            _LOGGER.warning("No response received for status update from projector '%s'", self._name)
-            return
-        
-        last_char = response.strip()[-1]
-        self._is_on = (last_char == '2')
