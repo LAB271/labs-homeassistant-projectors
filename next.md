@@ -8,7 +8,6 @@
 
 - [ ] Merge `up-to-spec/2026-04-29` into `main` (PR or fast-forward — solo maintainer's call).
 - [ ] Flip visibility to public — deferred in TODO.md until the lab is up to spec; do this after the branch above is merged and the lab-wide gate clears.
-- [ ] Branch protection on `main` — **SKIPPED this pass.** GitHub Free plan returns 403 on `gh api .../branches/main/protection` for private repos. Will become available for free once the repo flips public; revisit then. Same constraint applies to every private Lab271 repo on the current plan.
 
 ## Decisions needed
 
@@ -31,7 +30,6 @@
 
 ## Deviations from spec / notes
 
-- **Branch protection skipped** — GitHub Free plan does not allow protection rules on private repos. Documented above; no workaround applied this pass.
 - **Internal IP not scrubbed from history** — fixed forward only. Commit `2a71022` still contains `10.32.8.10`. Discloses RFC1918 space only; no public-internet target inferable. Acceptable per the up-to-spec call.
 - **Org casing (`Lab271` vs `LAB271`) skipped** — out of scope this pass.
 - **Public flip deferred** per TODO.md lab-wide gate.
