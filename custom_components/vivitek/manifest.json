@@ -1,8 +1,8 @@
 {
     "domain": "vivitek",
     "name": "Vivitek Projector",
-    "documentation": "https://github.com/LAB271/ha-vivitek/",
-    "issue_tracker": "https://github.com/LAB271/ha-vivitek/issues",
+    "documentation": "https://github.com/LAB271/labs-homeassistant-projectors/",
+    "issue_tracker": "https://github.com/LAB271/labs-homeassistant-projectors/issues",
     "iot_class": "local_polling",
     "dependencies": [],
     "version": "0.0.2",
