@@ -16,7 +16,7 @@ class SpaceLightsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required(CONF_HOST, default="10.32.8.10"): str,
+                vol.Required(CONF_HOST, default="192.0.2.10"): str,
                 vol.Required(CONF_NAME, default="Projector 1"): str,
             })
         )
