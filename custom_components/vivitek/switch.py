@@ -19,34 +19,24 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 class VivitekSwitch(SwitchEntity):
     """Representation of a Vivitek projector switch."""
 
+    _attr_has_entity_name = True
+    _attr_name = "Power"
+
     def __init__(self, name, host):
         """Initialize the switch."""
-        self._device_name = name
         self._host = host
-        self._name = f'{name}_power'
         self._is_on = False
         self._attr_unique_id = f"{host}_power"
-
-
-    @property
-    def name(self):
-        """Return the name of the switch."""
-        return self._name
-
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, host)},
+            name=name,
+            manufacturer="Vivitek",
+        )
 
     @property
     def is_on(self):
         """Return true if the switch is on."""
         return self._is_on
-
-    @property
-    def device_info(self):
-        """Return device information for this projector."""
-        return {
-            "identifiers": {(DOMAIN, self._host)},
-            "name": self._device_name,
-            "manufacturer": "Vivitek",
-        }
 
 
 
@@ -79,9 +69,9 @@ class VivitekSwitch(SwitchEntity):
                 s.settimeout(5)  # Timeout for socket
                 s.connect((self._host, DEFAULT_PORT))
                 s.sendall((command + '\r').encode())
-                _LOGGER.info("Sent command '%s' to projector '%s'", command, self._name)
+                _LOGGER.info("Sent command '%s' to projector at %s", command, self._host)
                 response = s.recv(1024)
                 return response.decode().strip()
         except Exception as e:
-            _LOGGER.error("Error communicating with projector '%s': %s", self._name, e)
+            _LOGGER.error("Error communicating with projector at %s: %s", self._host, e)
         return None
